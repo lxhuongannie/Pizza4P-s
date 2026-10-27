@@ -1,0 +1,868 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4P’s × ZBS Demo</title>
+<style>
+  :root{
+    --blue:#0068FF; --blue-d:#0050C8; --blue-l:#EAF2FF; --ink:#0F1B33; --mut:#5B6577; --line:#E3E8F0;
+    --bg:#F5F7FA; --card:#fff; --navy:#1B2B4B; --soft:#EDF1F7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+  svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .hdr{background:#fff;border-bottom:1px solid var(--line);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+  .logo .p{color:var(--ink)} .logo .x{color:var(--mut);font-weight:400} .logo .z{color:var(--blue)}
+  .hdr small{color:var(--mut)}
+  .live{background:var(--bg);color:var(--mut);border:1px solid var(--line);font-weight:700;font-size:11px;padding:3px 10px;border-radius:99px;letter-spacing:.04em}
+  .tabs{background:#fff;border-bottom:1px solid var(--line);display:flex;gap:4px;padding:0 20px;overflow-x:auto}
+  .tab{padding:12px 16px;cursor:pointer;font-weight:600;color:var(--mut);border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:8px}
+  .tab.on{color:var(--blue);border-color:var(--blue)}
+  main{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+  .pane{display:none}.pane.on{display:block}
+  h2{font-size:22px;margin-bottom:6px} h3{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:12px;font-weight:700}
+  .sub{color:var(--mut);margin-bottom:18px;max-width:840px}
+  .hero{background:var(--ink);color:#fff;border-radius:10px;padding:28px;margin-bottom:20px}
+  .hero .eb{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-bottom:8px}
+  .hero h1{font-size:26px;line-height:1.25;margin-bottom:10px;max-width:880px}
+  .hero p{opacity:.85;max-width:820px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+  .stat{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 14px}
+  .stat b{display:block;font-size:22px}.stat span{font-size:12px;opacity:.8}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+  .item{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+  .item:first-of-type{border-top:0;padding-top:0}
+  .item .ic{width:34px;height:34px;border-radius:8px;background:var(--soft);color:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+  .item h4{font-size:14px;margin-bottom:2px}.item p{color:var(--mut);font-size:13px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+  .b-pri{background:var(--blue-l);color:var(--blue)} .b-fut{background:var(--soft);color:#475569} .b-no{background:var(--soft);color:#8793A6}
+  .note{font-size:12px;color:var(--mut);margin-top:12px}
+  .btn{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:13.5px;font-family:inherit}
+  .btn:hover{background:var(--blue-d)} .btn.sec{background:var(--soft);color:var(--navy)} .btn.sec:hover{background:#E1E7F0}
+  .btn:disabled{opacity:.5;cursor:default}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{color:var(--mut);font-weight:600;font-size:12px}
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+  .node{flex:1;min-width:130px;border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;background:#fff}
+  .node.hl{border-color:var(--blue);background:var(--blue-l)} .node.old{border-style:dashed;background:#FAFBFC;color:var(--mut)}
+  .node b{display:block;font-size:13px}.node span{font-size:11.5px;color:var(--mut)}
+  .arr{align-self:center;color:var(--mut)}
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start}
+  .phone{width:320px;height:620px;background:var(--ink);border-radius:36px;padding:9px;margin:0 auto}
+  .screen{background:#EEF2F7;border-radius:28px;height:100%;overflow:hidden;display:flex;flex-direction:column}
+  .p-top{background:var(--blue);color:#fff;padding:24px 14px 10px;display:flex;align-items:center;gap:10px}
+  .av{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none}
+  .p-top b{font-size:14px}.p-top small{display:block;font-size:11px;opacity:.85}
+  .msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .m{max-width:88%;padding:8px 11px;border-radius:10px;font-size:12.5px;white-space:pre-line;animation:in .25s ease}
+  .m.in{background:#fff;align-self:flex-start;border-top-left-radius:3px}
+  .m.out{background:#CFE3FF;align-self:flex-end;border-top-right-radius:3px}
+  .m.sys{align-self:center;background:transparent;color:var(--mut);font-size:11px;text-align:center}
+  .m .nm{font-size:10.5px;font-weight:700;color:var(--blue);display:block;margin-bottom:2px}
+  .m .src{display:block;margin-top:6px;font-size:10.5px;color:var(--mut)}
+  .cta{display:block;margin-top:8px;text-align:center;border:1px solid var(--blue);color:var(--blue);border-radius:6px;padding:5px;font-weight:600;font-size:12px;cursor:pointer;background:#fff}
+  .cta:hover{background:var(--blue-l)}
+  .file{display:flex;gap:8px;align-items:center;margin-top:8px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:12px;background:#FAFBFC}
+  .zns{background:#fff;border-radius:10px;overflow:hidden;align-self:flex-start;width:92%;animation:in .25s ease;border:1px solid var(--line)}
+  .zns .zh{background:var(--navy);color:#fff;padding:8px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between}
+  .zns .zb{padding:10px 12px;font-size:12px}
+  .zns .zb div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line)}
+  .zns .zb div:last-child{border:0}.zns .zb span{color:var(--mut)}
+  .zns .zf{padding:9px 12px;text-align:center;color:var(--blue);font-weight:600;font-size:12px;border-top:1px solid var(--line)}
+  .menubar{display:flex;background:#fff;border-top:1px solid var(--line)}
+  .menubar button{flex:1;border:0;border-right:1px solid var(--line);background:#fff;padding:8px 2px;font-size:11px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit}
+  .menubar button:last-child{border-right:0}
+  .menubar button:hover{background:var(--blue-l)}
+  .menubar svg.i{width:16px;height:16px;color:var(--navy)}
+  .inp{display:flex;gap:6px;padding:8px;background:#fff;border-top:1px solid var(--line)}
+  .inp input{flex:1;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:12px;font-family:inherit;outline:0}
+  .inp input:focus{border-color:var(--blue)}
+  .inp button{border:0;background:var(--blue);color:#fff;border-radius:99px;width:30px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .inp svg.i{width:14px;height:14px}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .step{padding:8px 12px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600;font-size:12.5px}
+  .step.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .step small{display:block;font-weight:400;opacity:.8;font-size:11px}
+  pre.code{background:var(--ink);color:#CFE3FF;border-radius:8px;padding:14px;font-size:12px;overflow:auto;line-height:1.55}
+  .pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--blue-l);color:var(--blue);margin:2px 4px 2px 0}
+  .pill.on{background:var(--blue);color:#fff}
+  .sync{display:grid;grid-template-columns:1fr 130px 1fr;gap:14px;align-items:start}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .row small{display:block;color:var(--mut);font-size:11px}
+  .tagchip{display:inline-flex;gap:6px;align-items:center;background:var(--blue-l);color:#0A3D91;font-weight:600;font-size:12.5px;padding:4px 11px;border-radius:99px;margin:3px 4px 3px 0;cursor:pointer;border:1px solid transparent}
+  .tagchip i{font-style:normal;font-weight:500;color:var(--mut)}
+  .tagchip.sel{background:var(--blue);color:#fff} .tagchip.sel i{color:#CFE3FF}
+  .big{font-size:32px;font-weight:800}
+  .gmf{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .gmf .gh{background:#F7F9FC;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .gmf .gm{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:230px;max-height:300px;overflow-y:auto;background:#EEF2F7}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);background:var(--soft);padding:2px 9px;border-radius:99px;margin:0 6px 6px 0}
+  select{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
+  .ok{color:#12805C;font-size:12px;font-weight:600}.warn{color:#B45309;font-size:12px;font-weight:600}
+  .fld{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .fld small{display:block;color:var(--mut);font-size:11px}
+  .fld input[type=number]{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;text-align:right}
+  .fld select{width:100%}
+  .bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--soft);margin:10px 0 6px}
+  .bar span{display:block;height:100%}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr.tot td{font-weight:700;border-top:2px solid var(--ink)}
+  .zrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 12px;align-items:end;padding:14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fff;position:relative}
+  .zrow label{display:block;font-size:11px;color:var(--mut);margin-bottom:3px;font-weight:600}
+  .zrow input[type=text],.zrow input[type=number],.zrow select{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;background:#fff}
+  .zrow input[type=number]{text-align:right}
+  .zopts{display:flex;gap:8px;flex-wrap:wrap}
+  .chk{display:inline-flex !important;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:12px !important;color:var(--ink) !important;cursor:pointer;margin:0 !important;font-weight:500 !important}
+  .chk input{accent-color:var(--blue)}
+  .zout{text-align:right;border-left:1px solid var(--line);padding-left:12px}
+  .zout b{display:block;font-size:16px}
+  .zout small{display:block;color:var(--mut);font-size:11px;line-height:1.4}
+  .zdel{position:absolute;top:6px;right:8px;border:0;background:none;color:#8793A6;font-size:16px;cursor:pointer;line-height:1}
+  .zdel:hover{color:var(--ink)}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+  .kpi{background:var(--soft);border-radius:8px;padding:12px 14px}
+  .kpi span{display:block;font-size:12px;color:var(--mut)}.kpi b{font-size:20px}
+  .zwrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+  .zprev{position:sticky;top:12px}
+  .zrow{cursor:pointer}
+  .zrow.act{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+  .pvbox{background:#EEF2F7;border-radius:14px;padding:14px}
+  .pvbox .zns{width:100%}
+  .pvimg{height:96px;background:#D9E1EC;color:#5B6577;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px}
+  .pvimg svg.i{width:24px;height:24px}
+  .pvcap{margin-top:10px;font-size:12px;color:var(--mut);line-height:1.5}
+  .pvcap b{color:var(--ink)}
+  .tp{background:#fff;border-radius:8px;padding:11px 11px 10px;width:100%;align-self:flex-start;animation:in .25s ease;color:var(--ink)}
+  .tp .brand{color:#C8102E;font-weight:800;letter-spacing:.05em;font-size:14px;margin-bottom:7px}
+  .tp .banner{height:66px;margin:-11px -11px 9px;background:linear-gradient(#46506A,#222B3F);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:13px;line-height:1.25;padding:0 14px;border-radius:8px 8px 0 0}
+  .tp .tt{font-weight:700;font-size:11.5px;margin-bottom:5px}
+  .tp p{font-size:9.5px;color:#4A5568;margin-bottom:6px;line-height:1.4}
+  .tp .kv{display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:2px 0}
+  .tp .kv span{color:var(--mut)} .tp .kv b{text-align:right;font-weight:600}
+  .tp .code{color:var(--blue);font-weight:800;font-size:18px;letter-spacing:.04em;margin:3px 0 7px}
+  .tp .box{background:#EAF3FF;border:1px solid #CFE3FF;border-radius:6px;padding:7px 9px;margin:7px 0;font-size:10px;color:#4A5568}
+  .tp .box b{display:block;font-size:13px;color:var(--ink);margin:1px 0}
+  .tp .stars{background:#FFF8E1;border:1px solid #FDE9A8;border-radius:6px;padding:7px;text-align:center;letter-spacing:7px;color:#E0A800;margin:6px 0;font-size:15px}
+  .tp .b1,.tp .b2{text-align:center;border-radius:5px;padding:5px;font-size:10px;font-weight:600;margin-top:5px}
+  .tp .b1{background:var(--blue);color:#fff}.tp .b2{background:#EEF0F4;color:var(--ink)}
+  .tp .rs{display:flex;gap:6px;margin-top:6px}.tp .rs span{flex:1;text-align:center;border:1px solid var(--blue);color:var(--blue);border-radius:99px;padding:4px;font-size:10px;font-weight:600}
+  .mph{position:relative;width:100%;max-width:240px;aspect-ratio:393/852;margin:0 auto;border-radius:34px;border:7px solid #1B2230;overflow:hidden;background:#DCE6F4;display:flex;flex-direction:column;box-shadow:0 0 0 1px #3A4458}
+  .mph-h{background:#4C9BFF;color:#fff;padding:7px 12px 7px;flex:none}
+  .mph-s{display:flex;justify-content:space-between;align-items:center;font-size:9px;font-weight:700;height:18px;position:relative}
+  .mph-s .isl{position:absolute;left:50%;top:1px;transform:translateX(-50%);width:54px;height:15px;border-radius:99px;background:#0B0F17}
+  .mph-n{display:flex;align-items:center;gap:8px;font-size:10px;margin-top:4px}
+  .mph-n div{flex:1}.mph-n b{display:block;font-size:11px}.mph-n small{font-size:8.5px;opacity:.9}
+  .mph-b{flex:1;min-height:0;overflow:hidden;padding:8px;display:flex;flex-direction:column;gap:6px;justify-content:flex-start}
+  .mph-f{flex:none;background:#fff;color:#8793A6;font-size:9.5px;padding:7px 10px 12px;border-top:1px solid var(--line)}
+  .gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;align-items:start}
+  .gal figcaption{text-align:center;margin-top:10px;font-size:12px}
+  .gal figcaption b{display:block;font-size:12.5px;color:var(--navy)}
+  .gal figcaption span{color:var(--mut)}
+  .qmenu{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;background:#fff;border-top:1px solid var(--line)}
+  .qmenu button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 9px;font-size:10.5px;color:var(--ink);cursor:pointer;font-family:inherit}
+  .qmenu button:hover{background:var(--blue-l);border-color:var(--blue)}
+  .qmenu svg.i{width:12px;height:12px;color:var(--navy)}
+  .uc{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .uc div{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:600;background:#fff}
+  .uc div svg.i{color:var(--navy)}
+  .uc div.on{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+  .uc div.on svg.i{color:var(--blue)}
+  .frm{margin-top:6px;display:flex;flex-direction:column;gap:5px}
+  .frm input{border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:11px;font-family:inherit;width:100%}
+  .m .btns{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+  .m .btns .cta{margin-top:0}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:9}
+  .toast.on{opacity:1}
+  @media(max-width:900px){.grid2,.layout,.sync{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.hero h1{font-size:21px}.kpis{grid-template-columns:1fr}.zwrap{grid-template-columns:1fr}.zprev{position:static}.zout{text-align:left;border-left:0;padding-left:0}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo"><span class="p">Pizza 4P’s</span><span class="x">×</span><span class="z">Zalo Business Solutions</span></div>
+  <small>Giải pháp dành cho khối FMCG: ZBS Message Template tích hợp trực tiếp và Zalo OA cho khách hàng B2B</small>
+  <span class="live">BẢN DEMO</span>
+</div>
+<div class="tabs" id="tabs">
+  <div class="tab on" data-t="intro"><i data-i="building"></i>1. Hiện trạng và đề xuất</div>
+  <div class="tab" data-t="zns"><i data-i="send"></i>2. ZBS Message Template</div>
+  <div class="tab" data-t="b2b"><i data-i="chat"></i>3. Zalo OA cho B2B và nội bộ</div>
+  <div class="tab" data-t="tag"><i data-i="tag"></i>4. Nhãn khách hàng và Broadcast</div>
+  <div class="tab" data-t="budget"><i data-i="calc"></i>5. Ước tính ngân sách</div>
+</div>
+
+<main>
+
+<!-- ============ TAB 1 ============ -->
+<section class="pane on" id="intro">
+  <div class="hero">
+    <div class="eb">Pizza 4P’s · F&B · Khối FMCG</div>
+    <h1>Truyền thông theo hành trình đơn hàng và kết nối đối tác B2B trên một kênh Zalo chính thức</h1>
+    <p>Zalo OA của 4P’s hiện chủ yếu gửi tin cho khách hàng cá nhân (B2C), tiêu biểu là dịch vụ đặt bàn đã kết nối trực tiếp qua ZBS Message Template. Giai đoạn tiếp theo là mở rộng sang khách hàng và đối tác B2B của khối FMCG, đồng thời ứng dụng cho truyền thông nội bộ, và thay thế luồng gửi tin qua Macrokiosk cho các dịch vụ còn lại.</p>
+    <div class="stats">
+      <div class="stat"><b>B2C</b><span>OA hiện chủ yếu gửi tin cho khách hàng cá nhân (đặt bàn)</span></div>
+      <div class="stat"><b>6</b><span>Mẫu tin đang sử dụng, đều thuộc dịch vụ đặt bàn (tiếng Việt, tiếng Anh)</span></div>
+      <div class="stat"><b>0</b><span>Mẫu tin cho khối FMCG (pizza đông lạnh)</span></div>
+      <div class="stat"><b>B2B + Nội bộ</b><span>Nhu cầu mở rộng sang đối tác và truyền thông nội bộ</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Nhu cầu của 4P’s</h3>
+      <div class="item"><div class="ic"><i data-i="send"></i></div><div><h4>ZBS Message Template tích hợp trực tiếp<span class="badge b-pri">Ưu tiên</span></h4><p>Áp dụng cho các dịch vụ còn lại của 4P’s, thay thế luồng gửi tin qua Macrokiosk. Xây dựng kịch bản gửi tin theo hành trình khách hàng cho khối FMCG (pizza đông lạnh và các sản phẩm đông lạnh khác).</p></div></div>
+      <div class="item"><div class="ic"><i data-i="briefcase"></i></div><div><h4>Zalo OA cho khách hàng B2B<span class="badge b-pri">Ưu tiên</span></h4><p>Trao đổi với khách hàng và đối tác B2B về đơn hàng, đặt mua sản phẩm; cập nhật thông tin sản phẩm, chính sách giá, rebate và các thông báo kinh doanh.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="building"></i></div><div><h4>Truyền thông nội bộ<span class="badge b-pri">Mở rộng</span></h4><p>Ứng dụng Zalo OA cho thông báo và điều phối giữa các bộ phận như kinh doanh, kho vận và kế toán.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="db"></i></div><div><h4>Dữ liệu và CRM<span class="badge b-fut">Định hướng tương lai</span></h4><p>4P’s chưa triển khai CRM và đang định hướng đưa dữ liệu về kho dữ liệu nội bộ (Internal Data Warehouse) để phục vụ khai thác nội bộ.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="users"></i></div><div><h4>Phát triển người quan tâm (follower)<span class="badge b-no">Chưa có kế hoạch</span></h4><p>Chưa có kế hoạch cụ thể để tăng trưởng người quan tâm trên Zalo OA.</p></div></div>
+    </div>
+    <div class="card">
+      <h3>Giải pháp trên nền tảng Zalo OA và ZBS</h3>
+      <div class="item"><div class="ic"><i data-i="send"></i></div><div><h4>ZBS Template Message</h4><p>Tin theo mẫu đã đăng ký và được kiểm duyệt, gồm Tin Giao dịch và Tin Hậu mãi. Hệ thống 4P’s gửi trực tiếp qua OpenAPI theo từng giai đoạn của đơn hàng. Xem mục 2.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="menu"></i></div><div><h4>Menu nhanh và Zalo Chatbot</h4><p>Menu nhanh là thanh lối tắt trong khung chat (tối đa 6 mục). Zalo Chatbot chạy kịch bản không cần lập trình, trong đó có nhóm kịch bản mẫu Bán hàng tự động. Xem mục 3.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="users"></i></div><div><h4>Nhóm chat GMF (Quản lý nhóm)</h4><p>Nhóm chat do OA doanh nghiệp tạo và quản lý, thành viên là người dùng Zalo, dùng để trao đổi với đối tác B2B. Nhóm nội bộ là hướng thử nghiệm, cần xác nhận với Zalo. Xem mục 3.</p></div></div>
+      <div class="item"><div class="ic"><i data-i="tag"></i></div><div><h4>Nhãn khách hàng và Tin Broadcast</h4><p>Phân loại khách hàng từ hệ thống nội bộ được đồng bộ thành nhãn trên OA Manager, dùng để lọc đối tượng khi gửi Broadcast. Xem mục 4.</p></div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Hiện trạng OA “Pizza 4P’s”: các ZBS Message Template đang sử dụng</h3>
+    <table>
+      <tr><th>Tên mẫu tin</th><th>Ngôn ngữ</th><th>Mục đích</th></tr>
+      <tr><td>Pizza4Ps_VI_Bookingconfirmation</td><td>Tiếng Việt</td><td>Xác nhận đặt bàn</td></tr>
+      <tr><td>Pizza4Ps_EN_Bookingconfirmation2</td><td>Tiếng Anh</td><td>Xác nhận đặt bàn</td></tr>
+      <tr><td>Pizza4Ps_VI_Bookingcancellation / Bookingcancellation1</td><td>Tiếng Việt</td><td>Hủy đặt bàn</td></tr>
+      <tr><td>Pizza4Ps_EN_Bookingcancellation / Bookingcancellation1</td><td>Tiếng Anh</td><td>Hủy đặt bàn</td></tr>
+    </table>
+    <p class="note">Số liệu cập nhật ngày 26/10/2026. Toàn bộ mẫu tin hiện tại phục vụ dịch vụ đặt bàn của nhà hàng; chưa có mẫu tin nào cho khối FMCG.</p>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Kênh phân phối FMCG của 4P’s theo thông tin công khai</h3>
+    <table>
+      <tr><th>Đối tác</th><th>Loại kênh</th><th>Thông tin ghi nhận</th></tr>
+      <tr><td>7-Eleven Việt Nam</td><td>Cửa hàng tiện lợi</td><td>Bán Pizza 4P’s 4 Phô Mai 138g, Gà Teriyaki 150g và Margherita 133g trên 7-eleven.vn</td></tr>
+      <tr><td>FamilyMart Việt Nam</td><td>Cửa hàng tiện lợi</td><td>Đối tác phân phối sản phẩm đông lạnh</td></tr>
+      <tr><td>Annam Gourmet, Tops Market, Farmi.vn, Genshai</td><td>Siêu thị, bán lẻ thực phẩm</td><td>Đối tác phân phối sản phẩm đông lạnh</td></tr>
+      <tr><td>Nhà hàng, khách sạn, siêu thị</td><td>Cung cấp phô mai</td><td>4P’s sản xuất phô mai tại Lâm Đồng, dùng cho hệ thống nhà hàng và cung cấp cho khách hàng bên ngoài</td></tr>
+    </table>
+    <p class="note">Nguồn: trang sản phẩm 7-eleven.vn; Doanh nhân &amp; Pháp luật (05/04/2023); Inside Retail. Đây là nhóm đối tác B2B được dùng làm ví dụ trong các minh họa ở mục 3 và 4.</p>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Các loại tin nhắn của Zalo OA được áp dụng trong demo</h3>
+    <table>
+      <tr><th>Loại tin</th><th>Dùng cho</th><th>Điều kiện chính</th><th>Mục</th></tr>
+      <tr><td>Tin Tư vấn</td><td>Phản hồi, tư vấn khi người dùng chủ động tương tác (nhắn tin, dùng chatbot, bấm menu hoặc CTA)</td><td>Miễn phí trong 48 giờ kể từ tương tác cuối; gửi 24/24</td><td>3</td></tr>
+      <tr><td>Tin trong nhóm chat GMF</td><td>Giao tiếp với người dùng trong nhóm GMF của OA</td><td>OA dùng Gói Dịch vụ OA; nhóm có sẵn theo gói không phát sinh phí tin OA gửi, nhóm mua thêm tính phí theo tin; gửi qua OA Manager hoặc OpenAPI</td><td>3</td></tr>
+      <tr><td>Tin Broadcast</td><td>Thông báo, thông tin sản phẩm gửi đồng loạt</td><td>Người dùng đang quan tâm OA; tạo trên OA Manager (web); khung giờ 06:00 đến 19:59; theo hạn mức của gói dịch vụ</td><td>4</td></tr>
+      <tr><td>ZBS Template Message</td><td>Tin Giao dịch và Tin Hậu mãi theo mẫu đã duyệt</td><td>Đăng ký mẫu trên tài khoản ZBS hoặc OpenAPI; gửi qua số điện thoại hoặc UID</td><td>2</td></tr>
+    </table>
+    <p class="note">Nguồn: tài liệu “Tổng quan các loại tin nhắn trên Zalo Official Account” (oa.zalo.me, hiệu lực từ 01/01/2026). Mức phí và hạn mức cụ thể tham khảo bảng giá chính thức của Zalo.</p>
+  </div>
+  <div style="text-align:center;margin-top:18px"><button class="btn" onclick="go('zns')">Xem minh họa ZBS Message Template</button></div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section class="pane" id="zns">
+  <h2>ZBS Message Template: kết nối trực tiếp và hành trình đơn hàng FMCG</h2>
+  <p class="sub">Hệ thống của 4P’s kết nối trực tiếp với ZBS qua OpenAPI, loại bỏ đơn vị trung gian Macrokiosk. Chọn từng giai đoạn để xem tin nhắn đối tác nhận được.</p>
+
+  <div class="card" style="margin-bottom:18px">
+    <h3>Mô hình kết nối</h3>
+    <div class="flow">
+      <div class="node old"><b>Hiện tại</b><span>Hệ thống của 4P’s</span></div><div class="arr">→</div>
+      <div class="node old"><b>Macrokiosk</b><span>Đơn vị trung gian (các dịch vụ còn lại)</span></div><div class="arr">→</div>
+      <div class="node old"><b>Zalo</b><span>Khách hàng nhận tin</span></div>
+    </div>
+    <div class="flow" style="margin-top:12px">
+      <div class="node hl"><b>Đề xuất</b><span>Hệ thống của 4P’s (ERP, OMS, POS)</span></div><div class="arr">→</div>
+      <div class="node hl"><b>ZBS OpenAPI</b><span>ZBS Template Message · mẫu được kiểm duyệt trước</span></div><div class="arr">→</div>
+      <div class="node hl"><b>Zalo</b><span>Khách hàng nhận tin</span></div>
+    </div>
+    <p class="note">Dịch vụ đặt bàn đã kết nối trực tiếp. Danh sách các dịch vụ còn lại sẽ được thống nhất cùng 4P’s.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:18px">
+    <h3>Các giao diện ZBS Template Message</h3>
+    <div class="gal" id="gal"></div>
+    <p class="note">Năm nhóm giao diện thường dùng. Mẫu xác nhận đặt bàn là loại 4P’s đang dùng cho dịch vụ đặt bàn. Tên đối tác, mã đơn và số liệu chỉ mang tính minh họa.</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="p-top"><div class="av">4P</div><div><b>Pizza 4P’s</b><small>Official Account · ZBS Template Message</small></div></div>
+        <div class="msgs" id="znsMsgs"><div class="m sys">Chọn một giai đoạn để xem tin nhắn</div></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>Hành trình đơn hàng pizza đông lạnh (minh họa)</h3>
+        <div class="steps" id="znsSteps"></div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn" onclick="znsAuto()">Xem toàn bộ hành trình</button>
+          <button class="btn sec" onclick="znsReset()">Đặt lại</button>
+        </div>
+        <h3>Yêu cầu gửi tin qua API (rút gọn)</h3>
+        <pre class="code" id="znsCode">// Chọn một giai đoạn để xem nội dung yêu cầu</pre>
+        <p class="note">ZBS Template Message gồm hai loại là Tin Giao dịch và Tin Hậu mãi. Mẫu tin cần được đăng ký và Zalo kiểm duyệt trước khi gửi. Tên đối tác, mã đơn, sản phẩm và số liệu chỉ mang tính minh họa.</p>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section class="pane" id="b2b">
+  <h2>Zalo OA cho khách hàng, đối tác B2B và truyền thông nội bộ</h2>
+  <p class="sub">Đối tác bán lẻ trao đổi với khối FMCG của 4P’s ngay trên Zalo về đơn hàng, đặt mua, chính sách giá, rebate và thông báo kinh doanh. Nhóm chat GMF hỗ trợ trao đổi theo nhóm với đối tác và thử nghiệm cho nội bộ.</p>
+  <div style="margin-bottom:16px"><span class="note">Chọn đối tác để minh họa:</span> <span id="partnerPills"></span></div>
+  <div class="layout">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="p-top"><div class="av">4P</div><div><b>Pizza 4P’s FMCG</b><small>Official Account</small></div></div>
+        <div class="msgs" id="b2bMsgs"></div>
+        <div class="qmenu" id="qmenu"></div>
+        <div class="inp"><input id="b2bInput" placeholder="Nhập tin nhắn" onkeydown="if(event.key==='Enter')sendInput()"><button onclick="sendInput()" aria-label="Gửi"><i data-i="send"></i></button></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>Các thành phần trên màn hình hội thoại</h3>
+        <table>
+          <tr><th>Thành phần</th><th>Chức năng theo Zalo OA</th></tr>
+          <tr><td>Menu chính</td><td>Gồm Menu V1 hoặc Menu V2 (mỗi OA chọn một loại), 1 đến 3 menu, tên tối đa 20 ký tự. Hành động gồm mở menu con, truy vấn tự động, mở trang web, gọi điện, mở danh sách bài viết, quét mã QR, kích hoạt Zalo Chatbot, truy vấn hệ thống bên thứ ba</td></tr>
+          <tr><td>Menu nhanh</td><td>Hiển thị ngay trong khung chat, tối đa 6 mục, tên tối đa 20 ký tự. Hành động gồm: truy vấn tự động, gọi điện, mở danh sách bài viết, quét mã QR, kích hoạt chatbot (chọn kịch bản đã tạo), truy vấn hệ thống bên thứ ba. Không có hành động mở trang web. Zalo khuyến nghị dùng Menu V2 kết hợp menu nhanh</td></tr>
+          <tr><td>Zalo Chatbot</td><td>Trả lời tự động theo quy tắc và kịch bản đã cấu hình, không cần lập trình: văn bản, tệp, nút CTA, biểu mẫu thu thập thông tin, nội dung động qua API; có thể trả lời theo từ khóa</td></tr>
+          <tr><td>Tin Tư vấn</td><td>Nhân viên trả lời qua OA Manager khi người dùng đã tương tác</td></tr>
+        </table>
+        <h3 style="margin-top:18px">Menu nhanh trong demo (6 mục)</h3>
+        <table id="qmTable"></table>
+        <p class="note">Chatbot trả lời theo kịch bản, không đàm phán giá hay xử lý khiếu nại; các trường hợp này chuyển cho nhân viên qua Tin Tư vấn hoặc nhóm GMF. Gõ “giá”, “rebate”, “đơn” vào khung nhập để thử trả lời theo từ khóa.</p>
+      </div>
+      <p class="note">Tên đối tác lấy từ thông tin công khai về kênh phân phối của 4P’s. Nội dung hội thoại, giá và mức rebate chỉ mang tính minh họa, không phải chính sách thực tế. Nguồn: hướng dẫn Thanh menu tại oa.zalo.me và tài liệu Zalo Chatbot tại chatbot.zalo.me.</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:40px">Zalo Chatbot: bán hàng tự động theo kịch bản mẫu</h2>
+  <p class="sub">Zalo Chatbot dựng không cần lập trình, gồm quy tắc tự động (khi nào chạy) và kịch bản (chạy nội dung gì). Nền tảng có sẵn các nhóm kịch bản mẫu; 4P’s có thể bắt đầu từ nhóm Bán hàng tự động rồi tùy chỉnh cho đơn hàng B2B. Chọn “Chạy kịch bản” hoặc bấm trực tiếp các nút trong điện thoại.</p>
+  <div class="layout">
+    <div>
+      <div class="phone" id="salesPhone"><div class="screen">
+        <div class="p-top"><div class="av">4P</div><div><b>Pizza 4P’s FMCG</b><small>Official Account · Zalo Chatbot</small></div></div>
+        <div class="msgs" id="salesMsgs"></div>
+        <div class="inp"><input placeholder="Nhập tin nhắn" disabled><button disabled aria-label="Gửi"><i data-i="send"></i></button></div>
+      </div></div>
+      <div style="text-align:center;margin-top:12px"><button class="btn" onclick="salesAuto()">Chạy kịch bản</button> <button class="btn sec" onclick="salesReset()">Đặt lại</button></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>Marketing Automation với Zalo Chatbot</h3>
+        <div class="uc" id="ucGrid"></div>
+        <p class="note">Tám nhóm ứng dụng của Zalo Chatbot. Demo này minh họa nhóm Bán hàng tự động.</p>
+      </div>
+      <div class="card">
+        <h3>Quy tắc và kịch bản bán hàng tự động (minh họa)</h3>
+        <table>
+          <tr><th>Bước</th><th>Thành phần Zalo Chatbot</th><th>Nội dung</th></tr>
+          <tr><td>Kích hoạt</td><td>Quy tắc tự động: Khi người dùng gửi tin nhắn, hành động kiểm tra từ khóa rồi kích hoạt kịch bản. Hoặc menu nhanh “Đặt hàng tự động” kích hoạt chatbot</td><td>Từ khóa “đặt hàng”</td></tr>
+          <tr><td>Chào và lựa chọn</td><td>Văn bản và nút lựa chọn</td><td>Xem sản phẩm, xem khuyến mãi, thông tin liên hệ</td></tr>
+          <tr><td>Chọn sản phẩm, số lượng</td><td>Văn bản và nút lựa chọn</td><td>3 sản phẩm, số thùng</td></tr>
+          <tr><td>Thông tin giao hàng</td><td>Biểu mẫu thu thập thông tin</td><td>Tên cửa hàng, số điện thoại, địa chỉ</td></tr>
+          <tr><td>Tạo đơn</td><td>Nội dung động qua API</td><td>Tạo đơn trên hệ thống 4P’s, trả mã đơn</td></tr>
+          <tr><td>Sau đơn</td><td>Hành động gắn nhãn; Tin Tư vấn</td><td>Gắn nhãn “Đặt hàng qua chatbot”; chuyển nhân viên khi cần</td></tr>
+        </table>
+        <p class="note">Nội dung kịch bản mẫu cụ thể xem trong mục Chatbot của OA Manager (cần đăng nhập OA). Kịch bản ở đây dựng từ các thành phần chính thức của Zalo Chatbot và chỉ mang tính minh họa. Sau khi tạo đơn, hệ thống 4P’s tiếp tục gửi ZBS Template Message xác nhận đơn (mục 2). Nguồn: chatbot.zalo.me và oa.zalo.me.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="margin-top:40px">Nhóm chat GMF cho đối tác và nội bộ</h2>
+  <p class="sub">Khi cần trao đổi theo nhóm, OA tạo nhóm chat GMF. OA là trưởng nhóm, thành viên là người dùng Zalo đã quan tâm OA. Chọn một kịch bản để xem hội thoại trên điện thoại.</p>
+  <div class="layout">
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="p-top"><div class="av">4P</div><div><b id="gmfTitle">Nhóm chat GMF</b><small id="gmfSub">OA là trưởng nhóm</small></div></div>
+        <div class="msgs" id="gmfMsgs"><div class="m sys">Chọn “Nhóm với đối tác” hoặc “Nhóm nội bộ” để xem hội thoại.</div></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>Kịch bản nhóm</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <button class="btn" onclick="gmf('partner')">Nhóm với đối tác</button>
+          <button class="btn sec" onclick="gmf('internal')">Nhóm nội bộ</button>
+        </div>
+        <p class="note" style="margin-top:0">Nhóm với đối tác: trao đổi đơn hàng và báo giá giữa OA và đại diện mua hàng của đối tác đã chọn ở trên. Nhóm nội bộ: điều phối đơn giữa Kinh doanh, Kho vận và Kế toán.</p>
+      </div>
+      <div class="card">
+        <h3>Nhóm chat GMF theo Zalo OA</h3>
+        <table>
+          <tr><th>Nội dung</th><th>Quy định theo tài liệu Zalo</th></tr>
+          <tr><td>Khái niệm</td><td>Nhóm chat do OA doanh nghiệp tạo và quản lý, dùng để truyền đạt thông tin chính thức tới khách hàng mục tiêu</td></tr>
+          <tr><td>Tạo nhóm</td><td>Tại mục Chat trên OA Manager: chọn “Tạo nhóm”, chọn loại nhóm, đặt tên, thêm thành viên. Quản trị viên OA mới có quyền tạo và giải tán nhóm</td></tr>
+          <tr><td>Loại nhóm</td><td>GMF-10, GMF-50, GMF-100, GMF-1000 theo số thành viên tối đa</td></tr>
+          <tr><td>Thành viên</td><td>Người dùng Zalo. Mời qua OA Manager (chỉ người đã quan tâm OA) hoặc qua liên kết nhóm (trưởng nhóm hoặc phó nhóm phê duyệt)</td></tr>
+          <tr><td>Quyền nhắn tin</td><td>OA là trưởng nhóm và luôn gửi được tin. Thành viên chỉ nhắn được khi OA bật “Cho phép tất cả thành viên nhắn tin”</td></tr>
+          <tr><td>Thiết lập nâng cao</td><td>Cho phép thành viên nhắn tin; phê duyệt thành viên mới; cho thành viên mới đọc tin gần nhất; cho phép liên kết tham gia nhóm</td></tr>
+          <tr><td>Chi phí</td><td>Nhóm có sẵn theo Gói Dịch vụ OA: không phát sinh phí duy trì và phí tin OA gửi vào nhóm khi gói còn hiệu lực. Tin của thành viên miễn phí. Nhóm mua thêm: phí duy trì theo tháng như bảng giá bên dưới</td></tr>
+          <tr><td>Giá nhóm mua thêm</td><td>GMF-10: 25.000đ; GMF-50: 55.000đ; GMF-100: 75.000đ; GMF-1000: 300.000đ mỗi tháng (đã gồm VAT 10%). Gói Tăng trưởng kèm 1 nhóm GMF-100, gói Toàn diện kèm 3 nhóm. Tin OA gửi vào nhóm miễn phí đến 31/12/2026. Xem tính ngân sách ở mục 5</td></tr>
+          <tr><td>Thời hạn</td><td>Xem tại “Quản lý dịch vụ”, có thể bật gia hạn tự động trừ từ tài khoản ZBS. Không gia hạn thì nhóm tự giải tán sau 45 ngày kể từ ngày hết hạn; giải tán sẽ xóa thành viên và lịch sử, không khôi phục được</td></tr>
+        </table>
+        <p class="note">Tài liệu Zalo mô tả GMF cho nhóm giữa OA và khách hàng mục tiêu, không đề cập nhóm nội bộ nên cần xác nhận với Zalo trước khi dùng. Tài liệu cũng không giải thích GMF viết tắt từ gì. Nguồn: hướng dẫn Quản lý nhóm (GMF) và Chính sách GMF tại oa.zalo.me.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 4 ============ -->
+<section class="pane" id="tag">
+  <h2>Đồng bộ nhãn khách hàng từ hệ thống nội bộ sang OA Manager để gửi Broadcast đúng đối tượng</h2>
+  <p class="sub">4P’s đang định hướng đưa dữ liệu về Internal Data Warehouse. Khi có nguồn phân loại khách hàng nội bộ (CRM hoặc Data Warehouse), hệ thống gắn thành nhãn trên OA Manager để lọc đối tượng khi gửi Tin Broadcast.</p>
+
+  <div class="card" style="margin-bottom:18px">
+    <div class="sync">
+      <div>
+        <h3>Hệ thống nội bộ (CRM / Data Warehouse)</h3>
+        <div class="row"><div>Chuỗi cửa hàng tiện lợi<small>Phân loại kênh</small></div><b>24</b></div>
+        <div class="row"><div>Siêu thị, bán lẻ thực phẩm<small>Phân loại kênh</small></div><b>38</b></div>
+        <div class="row"><div>Nhà hàng, khách sạn<small>Phân loại kênh</small></div><b>210</b></div>
+        <div class="row"><div>Rebate hạng Vàng<small>Doanh số quý</small></div><b>22</b></div>
+        <div class="row"><div>Chưa đặt hàng 60 ngày<small>Lịch sử đơn</small></div><b>17</b></div>
+        <div class="row"><div>Đặt hàng từ 2 lần trở lên<small>Lịch sử đơn</small></div><b>150</b></div>
+      </div>
+      <div style="text-align:center;padding-top:40px">
+        <button class="btn" id="syncBtn" onclick="doSync()">Đồng bộ</button>
+        <p class="note" id="syncNote">Chưa đồng bộ</p>
+      </div>
+      <div>
+        <h3>Zalo OA Pizza 4P’s · Nhãn khách hàng</h3>
+        <div id="oaTags" class="note">Chọn “Đồng bộ” để gắn nhãn cho khách hàng đã quan tâm OA.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout" style="grid-template-columns:1fr 340px">
+    <div class="card">
+      <h3>Tạo Tin Broadcast</h3>
+      <p class="note" style="margin:0 0 6px">1. Chọn nhãn để xác định nhóm khách hàng</p>
+      <div id="bcTags"></div>
+      <p class="note" style="margin:12px 0 6px">Điều kiện lọc</p>
+      <span class="pill on" id="mAny" onclick="setMode('any')" style="cursor:pointer">Có một trong các nhãn</span>
+      <span class="pill" id="mAll" onclick="setMode('all')" style="cursor:pointer">Có tất cả các nhãn</span>
+      <p class="note" style="margin:12px 0 6px">2. Chọn nội dung</p>
+      <div id="bcMsgs"></div>
+      <p class="note" style="margin:12px 0 6px">3. Giờ gửi</p>
+      <select id="bcHour" onchange="renderBc()"></select> <span id="bcWin"></span>
+      <div style="display:flex;align-items:end;justify-content:space-between;margin-top:18px;gap:12px;flex-wrap:wrap">
+        <div><div class="big" id="bcCount">0</div><span class="note">đối tác dự kiến nhận tin</span></div>
+        <span><button class="btn sec" onclick="autoPlay()">Chạy tự động</button> <button class="btn" onclick="sendBc()">Gửi Broadcast</button></span>
+      </div>
+      <p class="note">Tin Broadcast gửi cho người dùng đang quan tâm OA, tạo trên OA Manager (web), trong khung giờ 06:00 đến 19:59 và theo hạn mức của gói dịch vụ. Số lượng chỉ mang tính minh họa; các nhóm có thể trùng nhau.</p>
+    </div>
+    <div>
+      <div class="phone" style="height:520px"><div class="screen">
+        <div class="p-top"><div class="av">4P</div><div><b>Pizza 4P’s FMCG</b><small>Official Account</small></div></div>
+        <div class="msgs" id="bcPhone"><div class="m sys">Chọn nhãn và nội dung, sau đó gửi Broadcast</div></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 5 ============ -->
+<section class="pane" id="budget">
+  <h2>Ước tính ngân sách theo loại tin nhắn và số lượng</h2>
+  <p class="sub">Mỗi dòng là một mẫu ZBS Template Message. Chọn loại template, nút CTA, hình ảnh và số lượng gửi mỗi tháng; khung bên phải hiển thị tin nhắn khách nhận được và đơn giá. Chi phí OA (Tin Tư vấn, nhóm GMF, gói dịch vụ) tính ở phần bên dưới. Số lượng mặc định chỉ mang tính minh họa.</p>
+
+  <div class="card" style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <h3 style="margin:0">ZBS Template Message theo từng mẫu tin</h3>
+      <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="bTbl" aria-label="Bảng giá tham chiếu"><option value="A">Bảng giá: trang bảng giá Zalo</option><option value="B">Bảng giá: thông báo 27/02/2026</option></select>
+        <button class="btn sec" onclick="addRow()">Thêm mẫu tin</button>
+      </span>
+    </div>
+    <div class="zwrap">
+      <div id="zRows"></div>
+      <div class="zprev">
+        <h3>Xem trước tin nhắn</h3>
+        <div id="zPrev"></div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span>Tổng số tin mỗi tháng</span><b id="kQty">0</b></div>
+      <div class="kpi"><span>Đơn giá trung bình mỗi tin</span><b id="kAvg">0đ</b></div>
+      <div class="kpi"><span>Chi phí ZBS Template Message mỗi tháng (chưa VAT)</span><b id="kZbs">0đ</b></div>
+    </div>
+    <p class="note">Đơn giá một tin = giá theo loại template + hình ảnh + nút phản hồi + các nút CTA tùy chọn. Nút CTA bắt buộc đi kèm loại template không tính phí. Với Trang OA, Mini App và bài viết OA, nút đầu tiên miễn phí và từ nút thứ hai tính 100đ; các đích khác tính theo bảng giá riêng. Gửi qua UID được áp dụng mức trợ giá thấp hơn gửi qua số điện thoại nên chi phí thực tế có thể khác.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Tin Tư vấn, nhóm GMF và gói dịch vụ OA</h3>
+      <div class="fld"><div>Tin Tư vấn ngoài khung 48 giờ mỗi tháng<small>Nhân viên trả lời sau 48 giờ kể từ tương tác cuối</small></div><input type="number" id="bAdvice" value="800" min="0"></div>
+      <div class="fld"><div>Số nhóm GMF-10 cần dùng</div><input type="number" id="bG10" value="0" min="0"></div>
+      <div class="fld"><div>Số nhóm GMF-50 cần dùng</div><input type="number" id="bG50" value="2" min="0"></div>
+      <div class="fld"><div>Số nhóm GMF-100 cần dùng</div><input type="number" id="bG100" value="4" min="0"></div>
+      <div class="fld"><div>Số nhóm GMF-1000 cần dùng</div><input type="number" id="bG1000" value="0" min="0"></div>
+      <div class="fld"><div>Gói dịch vụ OA (trả theo năm)</div>
+        <select id="bPkg"><option value="0">Cơ bản</option><option value="1">Tiêu chuẩn</option><option value="2">Tăng trưởng</option><option value="3" selected>Toàn diện</option></select></div>
+      <div class="fld"><div>Cộng VAT 10% cho ZBS Template Message<small>Đơn giá template chưa gồm VAT</small></div><input type="checkbox" id="bVat" checked style="justify-self:end;width:18px;height:18px"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>Ngân sách ước tính</h3>
+        <table id="bTable"></table>
+        <div class="bar" id="bBar"></div>
+        <div class="legend" id="bLegend"></div>
+      </div>
+      <div class="card">
+        <h3>Cơ sở tính</h3>
+        <p class="note" style="margin-top:0">ZBS Template Message tính theo tin gửi thành công; đơn giá chưa gồm VAT. Gói dịch vụ OA, Tin Tư vấn và nhóm GMF đã gồm VAT 10%. Tin Broadcast tính theo hạn mức của gói dịch vụ, không tính từng tin. Tin OA gửi vào nhóm GMF miễn phí đến 31/12/2026; tin của thành viên luôn miễn phí.</p>
+        <p class="note">Hai nguồn của Zalo đang ghi đơn giá template khác nhau (trang bảng giá và thông báo 27/02/2026), nên có thể chọn bảng giá tham chiếu ở phía trên. Giá hình ảnh (300đ) và nút phản hồi (100đ) lấy từ thông báo 27/02/2026. Loại Đánh giá dịch vụ, hóa đơn được tính theo mức của các loại còn lại vì Zalo chưa công bố riêng. Nguồn: zalo.solutions/business-message/pricing, thông báo cập nhật đơn giá ZBS Template Message và zalo.solutions/oa/pricing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const ICON={
+ send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',
+ chat:'<path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/>',
+ users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+ tag:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8zM7.5 7.5h.01"/>',
+ db:'<path d="M12 8c4.4 0 8-1.3 8-3s-3.6-3-8-3-8 1.3-8 3 3.6 3 8 3zM4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+ building:'<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01"/>',
+ menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',
+ bot:'<path d="M12 8V4M8 4h8M5 8h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM9 13h.01M15 13h.01"/>',
+ phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+ link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+ briefcase:'<path d="M3 7h18v13H3zM8 7V4h8v3M3 13h18"/>',
+ calc:'<path d="M4 3h16v18H4zM8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>',
+ image:'<path d="M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M9 9h.01"/>',
+ cart:'<path d="M3 4h2l2.4 11h10.2L20 7H6.2M9 20h.01M17 20h.01"/>',
+ clip:'<path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/>',
+ care:'<path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z"/>',
+ chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+ quiz:'<path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+ share:'<path d="M4 4h16v16H4zM4 9h16M9 9v11"/>',
+ percent:'<path d="M19 5L5 19M7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>',
+ calendar:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/>',
+ qr:'<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v.01M14 20h.01M20 20h.01"/>',
+ article:'<path d="M5 3h14v18H5zM9 8h6M9 12h6M9 16h4"/>',
+ file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/>'
+};
+function icon(n){return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+ICON[n]+'</svg>'}
+document.querySelectorAll('i[data-i]').forEach(e=>{e.outerHTML=icon(e.dataset.i)});
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),2400)}
+function go(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.t===id));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));scrollTo(0,0)}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.t));
+function add(box,cls,html,name){const d=document.createElement('div');d.className='m '+cls;d.innerHTML=(name?'<span class="nm">'+name+'</span>':'')+html;box.appendChild(d);box.scrollTop=box.scrollHeight;return d}
+
+/* ---------- TAB 2: ZBS Template Message journey ---------- */
+const MAND={other:'Xem chi tiết',auth:'Sao chép mã',voucher:'Xem mã ưu đãi',pay:'Thanh toán ngay',rate:'Xem hóa đơn'};
+function tplCard(o){
+  let h='<div class="tp"><div class="brand">PIZZA 4P’S</div>';
+  if(o.type==='auth'){
+    h+='<div class="tt">Mã xác thực của bạn là</div><div class="code">1350246</div><p>Tuyệt đối KHÔNG chia sẻ mã xác thực cho bất kỳ ai dưới bất kỳ hình thức nào. Mã xác thực có hiệu lực trong 5 phút.</p>';
+  }else{
+    if(o.img)h='<div class="tp"><div class="banner">'+o.title+'</div><div class="brand">PIZZA 4P’S</div>';
+    else h+='<div class="tt">'+o.title+'</div>';
+    if(o.body)h+='<p>'+o.body+'</p>';
+    if(o.type==='rate')h+='<div class="stars">☆☆☆☆☆</div>';
+    (o.rows||[]).forEach(r=>{h+='<div class="kv"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'});
+    if(o.type==='pay')h+='<div class="box">Số tiền thanh toán<b>'+(o.amount||'48.000.000 đ')+'</b>'+(o.bank||'Ngân hàng (minh họa) · Tài khoản 0123456789')+'</div>';
+    if(o.type==='voucher')h+='<div class="box"><b>'+(o.vch||'Giảm 5.000.000đ')+'</b>'+(o.vsub||'Áp dụng cho đơn từ 50.000.000đ')+'<br>'+(o.hsd||'HSD: 31/12/2026')+'</div>';
+  }
+  h+='<div class="b1">'+(o.primary||MAND[o.type])+'</div>';
+  (o.ctas||[]).forEach(c=>{h+='<div class="b2">'+c+'</div>'});
+  if(o.resp)h+='<div class="rs"><span>Đã nhận hàng</span><span>Cần hỗ trợ</span></div>';
+  return h+'</div>';
+}
+const miniPhone=inner=>'<div class="mph"><div class="mph-h"><div class="mph-s"><span>9:41</span><i class="isl"></i><span>5G</span></div><div class="mph-n"><span>‹</span><div><b>Pizza 4P’s</b><small>Tài khoản OA</small></div><span>≡</span></div></div><div class="mph-b">'+inner+'</div><div class="mph-f">Tin nhắn</div></div>';
+const J=[
+ {k:'Xác nhận đơn',s:'Tin Giao dịch · khi đơn được tạo',tpl:'FMCG_Order_Confirmation',type:'other',title:'Xác nhận đơn hàng thành công',body:'Pizza 4P’s xác nhận đơn hàng của Quý đối tác. Thông tin chi tiết như sau.',rows:[['Mã đơn','PZ-240611'],['Đối tác','Chuỗi cửa hàng tiện lợi'],['Sản phẩm','4 Phô Mai 138g x 120 thùng'],['Giá trị','48.000.000đ'],['Dự kiến giao','Thứ Năm, 14:00']],primary:'Xem chi tiết đơn'},
+ {k:'Đang giao',s:'Tin Giao dịch · khi xuất kho',tpl:'FMCG_Order_Shipping',type:'other',title:'Đơn hàng đang được giao',body:'Đơn hàng đã xuất kho và đang trên đường giao đến Quý đối tác.',rows:[['Mã đơn','PZ-240611'],['Xe giao','51C-123.45'],['Tài xế','Anh Hải'],['Dự kiến đến','Hôm nay, 14:00']],primary:'Theo dõi giao hàng'},
+ {k:'Đã giao',s:'Tin Giao dịch · khi xác nhận nhận hàng',tpl:'FMCG_Order_Delivered',type:'other',title:'Giao hàng thành công',body:'Đơn hàng đã được giao đến Quý đối tác.',rows:[['Mã đơn','PZ-240611'],['Thời gian giao','14:10 hôm nay'],['Số thùng','120 / 120']],primary:'Xem biên bản giao nhận'},
+ {k:'Yêu cầu thanh toán',s:'Tin Giao dịch · khi đến hạn công nợ',tpl:'FMCG_Payment_Request',type:'pay',title:'Thông tin thanh toán đơn hàng',body:'Pizza 4P’s gửi Quý đối tác thông tin thanh toán đơn hàng. Vui lòng thanh toán đúng hạn.',rows:[['Mã đơn hàng','PZ-240611'],['Trạng thái','Chưa thanh toán'],['Hạn thanh toán','18:00, 05/11/2026']],amount:'48.000.000 đ',primary:'Thanh toán ngay'},
+ {k:'Cập nhật rebate',s:'Tin Hậu mãi · khi chốt kỳ',tpl:'FMCG_Rebate_Update',type:'other',title:'Cập nhật rebate quý',body:'Tình hình doanh số và rebate của Quý đối tác trong quý.',rows:[['Doanh số quý','412.000.000đ'],['Mốc kế tiếp','500.000.000đ'],['Còn thiếu','88.000.000đ'],['Rebate hiện tại','3%']],primary:'Xem chính sách rebate'},
+ {k:'Đánh giá dịch vụ',s:'Tin Hậu mãi · sau khi giao hàng',tpl:'FMCG_Service_Rating',type:'rate',title:'Đánh giá chất lượng dịch vụ',body:'Cảm ơn Quý đối tác đã nhập hàng tại Pizza 4P’s. Vui lòng đánh giá chất lượng giao hàng và hỗ trợ của chúng tôi.',rows:[],primary:'Xem hóa đơn'},
+ {k:'Ưu đãi voucher',s:'Tin Hậu mãi · ưu đãi đơn kế tiếp',tpl:'FMCG_Voucher',type:'voucher',title:'Ưu đãi dành cho đối tác',body:'Tri ân Quý đối tác, Pizza 4P’s gửi mã giảm giá cho đơn nhập hàng kế tiếp.',rows:[],vch:'Giảm 5.000.000đ',vsub:'Áp dụng cho đơn từ 50.000.000đ',hsd:'HSD: 31/12/2026',primary:'Xem mã ưu đãi'}
+];
+const TPL={auth:{type:'auth',title:'Mã xác thực',rows:[],primary:'Sao chép mã'},other:J[0],pay:J[3],rate:J[5],voucher:J[6]};
+const GAL=[
+ {type:'auth',en:'Verification',vi:'Xác thực (OTP)',ctas:[]},
+ {type:'other',img:true,en:'Table Confirmation / Customize',vi:'Xác nhận đặt bàn, tùy chỉnh',title:'Xác nhận đặt bàn thành công',body:'Pizza 4P’s xác nhận Quý khách đã đặt bàn thành công. Thông tin chi tiết như sau.',rows:[['Mã đặt bàn','XYZ123'],['Số lượng người','6'],['Thời gian đặt','16:00'],['Ngày đặt','04/03/2026']],primary:'Xem menu',ctas:['Chương trình ưu đãi','Liên hệ CSKH']},
+ {type:'pay',en:'Payment request',vi:'Yêu cầu thanh toán',title:J[3].title,body:J[3].body,rows:J[3].rows,primary:'Thanh toán ngay',ctas:['Kiểm tra đơn hàng','Liên hệ CSKH']},
+ {type:'rate',en:'Service Rating / Bill',vi:'Đánh giá dịch vụ, hóa đơn',title:J[5].title,body:J[5].body,rows:[],primary:'Xem hóa đơn',ctas:['Liên hệ CSKH']},
+ {type:'voucher',en:'Promotion / Voucher',vi:'Ưu đãi, voucher',title:J[6].title,body:J[6].body,rows:[],primary:'Xem mã ưu đãi',ctas:['Xem giỏ hàng','Liên hệ CSKH']}
+];
+function renderGal(){$('#gal').innerHTML=GAL.map(g=>`<figure>${miniPhone(tplCard(g))}<figcaption><b>${g.en}</b><span>${g.vi}</span></figcaption></figure>`).join('')}
+renderGal();
+let jDone=-1;
+function znsRender(){$('#znsSteps').innerHTML=J.map((j,i)=>`<div class="step ${i===jDone?'on':''}" onclick="znsSend(${i})">${i+1}. ${j.k}<small>${j.s}</small></div>`).join('')}
+function znsSend(i){
+  const j=J[i];jDone=i;znsRender();const b=$('#znsMsgs');
+  if(b.querySelector('.sys'))b.innerHTML='';
+  b.insertAdjacentHTML('beforeend',tplCard(j));
+  b.scrollTop=b.scrollHeight;
+  $('#znsCode').textContent=`POST https://business.openapi.zalo.me/message/template\n{\n  "phone": "84912xxxxxx",\n  "template_id": "${j.tpl}",\n  "template_data": {\n${j.rows.map(r=>`    "${r[0]}": "${r[1]}"`).join(',\n')}\n  },\n  "tracking_id": "PZ-240611-${i+1}"\n}\n\n// Trạng thái gửi và kết quả trả về trực tiếp cho hệ thống 4P’s`;
+}
+function znsReset(){jDone=-1;$('#znsMsgs').innerHTML='<div class="m sys">Chọn một giai đoạn để xem tin nhắn</div>';$('#znsCode').textContent='// Chọn một giai đoạn để xem nội dung yêu cầu';znsRender()}
+async function znsAuto(){znsReset();for(let i=0;i<J.length;i++){znsSend(i);await sleep(1300)}}
+znsRender();
+
+/* ---------- TAB 3: Menu, chatbot, tin tư vấn, GMF ---------- */
+const PARTNERS=['7-Eleven Việt Nam','FamilyMart Việt Nam','Annam Gourmet','Tops Market'];
+let partner=0,gmfBusy=false;
+const catalog='• Pizza 4P’s 4 Phô Mai 138g (thùng 12): 800.000đ\n• Pizza 4P’s Gà Teriyaki 150g (thùng 12): 830.000đ\n• Pizza 4P’s Margherita 133g (thùng 12): 780.000đ';
+function botMsg(box,html,extra){const d=add(box,'in',html,'Chatbot');if(extra)d.insertAdjacentHTML('beforeend',extra);return d}
+const cta=(t,fn)=>`<span class="cta" onclick="${fn}">${t}</span>`;
+function resetPhone(){
+  const P=PARTNERS[partner];
+  $('#b2bMsgs').innerHTML='<div class="m sys">Đối tác minh họa: '+P+'</div>';
+  botMsg($('#b2bMsgs'),'Xin chào quý đối tác '+P+'. Anh/chị có thể chọn nội dung ở thanh menu bên dưới hoặc nhập từ khóa như “giá”, “rebate”, “đơn”.');
+}
+const QM=[
+ ['order','cart','Đặt hàng tự động','Kích hoạt chatbot (kịch bản Bán hàng tự động)'],
+ ['price','file','Bảng giá','Kích hoạt chatbot (kịch bản Bảng giá)'],
+ ['rebate','db','Rebate của tôi','Truy vấn hệ thống bên thứ ba (API 4P’s)'],
+ ['catalog','article','Danh mục sản phẩm','Mở danh sách bài viết'],
+ ['hotline','phone','Gọi hotline','Gọi điện'],
+ ['qr','qr','Quét QR đơn hàng','Quét mã QR']
+];
+function renderQM(){
+  $('#qmenu').innerHTML=QM.map(m=>`<button onclick="menuTap('${m[0]}')" title="${m[3]}">${icon(m[1])}${m[2]}</button>`).join('');
+  $('#qmTable').innerHTML='<tr><th>Tên menu nhanh</th><th>Số ký tự</th><th>Loại hành động</th></tr>'+QM.map(m=>`<tr><td>${m[2]}</td><td>${m[2].length} / 20</td><td>${m[3]}</td></tr>`).join('');
+}
+async function menuTap(k){
+  const box=$('#b2bMsgs');
+  if(k==='hotline'){add(box,'sys','Menu nhanh: gọi điện tới hotline kinh doanh FMCG');toast('Loại hành động: Gọi điện');return}
+  if(k==='qr'){add(box,'sys','Menu nhanh: mở trình quét mã QR');await sleep(500);add(box,'out','Đã quét mã đơn hàng PZ-240611');await sleep(500);bot('status');return}
+  if(k==='catalog'){add(box,'sys','Menu nhanh: mở danh sách bài viết');await sleep(400);add(box,'in','1. Danh mục sản phẩm FMCG\n2. Bảng giá và chính sách rebate\n3. Hướng dẫn đặt hàng cho đối tác','Bài viết OA');return}
+  if(k==='rebate'){add(box,'sys','Menu nhanh: truy vấn hệ thống bên thứ ba (API của 4P’s)');await sleep(500);bot('rebate');return}
+  add(box,'sys','Menu nhanh: kích hoạt chatbot, kịch bản “'+({order:'Bán hàng tự động',price:'Bảng giá'})[k]+'”');
+  await sleep(500);bot(k);
+}
+function bot(k){
+  const box=$('#b2bMsgs');
+  if(k==='order'){botMsg(box,'Kịch bản Bán hàng tự động đã được kích hoạt. Xem toàn bộ kịch bản ở khung điện thoại bên dưới.',cta('Xem kịch bản bán hàng tự động','salesJump()'))}
+  else if(k==='price'){botMsg(box,'Bảng giá hiện hành (minh họa):\n'+catalog+'\n\nGiá chưa bao gồm VAT, áp dụng từ 01/11.','<div class="file">'+icon('file')+'<span>Bang-gia-FMCG-01-11.pdf</span></div><span class="src">Thành phần kịch bản: văn bản, tệp đính kèm</span>')}
+  else if(k==='rebate'){botMsg(box,'Doanh số quý này của '+PARTNERS[partner]+': 412 triệu đồng.\nMức rebate hiện tại: 3%. Còn 88 triệu đồng để đạt mốc 4% (từ 500 triệu đồng).','<span class="src">Nội dung động lấy từ hệ thống 4P’s qua API</span>'+cta('Xem chính sách rebate',"toast('Nút CTA mở liên kết hoặc Mini App')"))}
+  else if(k==='status'){botMsg(box,'Đơn PZ-240611 đang được giao, dự kiến đến kho lúc 14:00 hôm nay.','<span class="src">Nội dung động lấy từ hệ thống 4P’s qua API</span>')}
+  else{botMsg(box,'Nội dung này cần nhân viên phụ trách hỗ trợ.',cta('Gặp nhân viên tư vấn','staff()'))}
+}
+async function orderForm(){
+  const box=$('#b2bMsgs');add(box,'out','Đã gửi biểu mẫu: 4 Phô Mai 138g, 120 thùng, giao Thứ Năm, kho Quận 7');
+  await sleep(600);botMsg(box,'Đã ghi nhận yêu cầu đặt hàng. Nhân viên kinh doanh sẽ xác nhận trong giờ làm việc.')
+}
+async function staff(){
+  const box=$('#b2bMsgs');add(box,'out','Gặp nhân viên tư vấn');await sleep(700);
+  add(box,'in','Xin chào anh/chị, em là nhân viên Kinh doanh của Pizza 4P’s. Em có thể hỗ trợ gì cho anh/chị ạ?','Nhân viên 4P’s');
+  add(box,'sys','Tin Tư vấn: nhân viên trả lời qua OA Manager, miễn phí trong 48 giờ kể từ tương tác cuối');
+}
+function sendInput(){
+  const el=$('#b2bInput');const t=el.value.trim();if(!t)return;el.value='';
+  const box=$('#b2bMsgs');add(box,'out',t);const l=t.toLowerCase();
+  setTimeout(()=>{
+    if(l.includes('giá'))bot('price');else if(l.includes('rebate'))bot('rebate');
+    else if(l.includes('đơn')||l.includes('giao'))bot('status');else bot('other');
+  },500);
+}
+const UC=[['cart','Bán hàng tự động',1],['clip','Yêu cầu thông tin'],['care','Chăm sóc khách hàng'],['chart','Thực hiện khảo sát'],['quiz','Tạo quiz trắc nghiệm'],['share','Chia sẻ thông tin'],['percent','Gửi mã khuyến mãi'],['calendar','Đặt lịch hẹn tự động']];
+function renderUC(){$('#ucGrid').innerHTML=UC.map(u=>`<div class="${u[2]?'on':''}">${icon(u[0])}${u[1]}</div>`).join('')}
+const PRODUCTS=['Pizza 4P’s 4 Phô Mai 138g','Pizza 4P’s Gà Teriyaki 150g','Pizza 4P’s Margherita 133g'];
+let sales={p:0,q:0},salesBusy=false;
+const sb=()=>$('#salesMsgs');
+const btns=arr=>'<div class="btns">'+arr.map(a=>`<span class="cta" onclick="${a[1]}">${a[0]}</span>`).join('')+'</div>';
+function salesReset(){
+  salesBusy=false;sales={p:0,q:0};const P=PARTNERS[partner];
+  sb().innerHTML='<div class="m sys">Quy tắc: người dùng nhắn “đặt hàng” hoặc chọn menu nhanh “Đặt hàng tự động” kích hoạt kịch bản Bán hàng tự động</div>';
+  add(sb(),'in','Xin chào Quý đối tác '+P+'. Chúng tôi có thể giúp gì cho anh/chị?'+btns([['Xem danh sách sản phẩm','salesList()'],['Xem khuyến mãi','salesPromo()'],['Thông tin liên hệ','salesContact()']]),'Chatbot');
+}
+async function salesList(){add(sb(),'out','Xem danh sách sản phẩm');await sleep(400);add(sb(),'in','Danh sách sản phẩm (minh họa):\n'+catalog+'\n\nAnh/chị muốn đặt sản phẩm nào?'+btns(PRODUCTS.map((n,i)=>['Chọn '+n.replace('Pizza 4P’s ',''),'salesPick('+i+')'])),'Chatbot')}
+async function salesPromo(){add(sb(),'out','Xem khuyến mãi');await sleep(400);add(sb(),'in','Chương trình hiện hành (minh họa): rebate 4% khi đạt 500 triệu đồng doanh số quý; tặng mẫu thử cho đơn từ 50 thùng.'+btns([['Xem danh sách sản phẩm','salesList()']]),'Chatbot')}
+async function salesContact(){add(sb(),'out','Thông tin liên hệ');await sleep(400);add(sb(),'in','Hotline kinh doanh FMCG: 1900 xxxx (minh họa). Giờ làm việc: 08:00 đến 18:00 các ngày trong tuần.'+btns([['Gặp nhân viên tư vấn','salesStaff()']]),'Chatbot')}
+async function salesPick(i){sales.p=i;add(sb(),'out','Chọn '+PRODUCTS[i]);await sleep(400);add(sb(),'in','Anh/chị đặt bao nhiêu thùng?'+btns([['50 thùng','salesQty(50)'],['100 thùng','salesQty(100)'],['120 thùng','salesQty(120)'],['200 thùng','salesQty(200)']]),'Chatbot')}
+async function salesQty(n){sales.q=n;add(sb(),'out',n+' thùng');await sleep(400);add(sb(),'in','Vui lòng cho biết thông tin nhận hàng:<div class="frm"><input value="'+PARTNERS[partner]+' · Cửa hàng Quận 7"><input value="0912 345 678"><input value="Kho lạnh, Quận 7, TP.HCM"></div>'+btns([['Gửi đơn hàng','salesSubmit()']])+'<span class="src">Thành phần kịch bản: biểu mẫu thu thập thông tin</span>','Chatbot')}
+async function salesSubmit(){
+  add(sb(),'out','Đã gửi biểu mẫu đặt hàng');await sleep(500);
+  add(sb(),'in','Đã ghi nhận đơn hàng.\nMã đơn: PZ-240612\nSản phẩm: '+PRODUCTS[sales.p]+' x '+sales.q+' thùng\nDự kiến giao: Thứ Năm, 14:00'+btns([['Theo dõi đơn hàng',"toast('Nút CTA mở liên kết hoặc Mini App')"],['Gặp nhân viên tư vấn','salesStaff()']])+'<span class="src">Nội dung động: đơn được tạo trên hệ thống 4P’s qua API</span>','Chatbot');
+  await sleep(500);add(sb(),'sys','Hành động: gắn nhãn “Đặt hàng qua chatbot” cho người dùng');
+  await sleep(400);add(sb(),'sys','Hệ thống 4P’s gửi tiếp ZBS Template Message xác nhận đơn (mục 2)');
+}
+async function salesStaff(){add(sb(),'out','Gặp nhân viên tư vấn');await sleep(600);add(sb(),'in','Xin chào anh/chị, em là nhân viên Kinh doanh của Pizza 4P’s. Em sẽ hỗ trợ đơn hàng của anh/chị ạ.','Nhân viên 4P’s');add(sb(),'sys','Tin Tư vấn: nhân viên trả lời qua OA Manager')}
+async function salesAuto(){
+  if(salesBusy)return;salesReset();salesBusy=true;
+  await sleep(900);await salesList();await sleep(1100);await salesPick(0);await sleep(1100);await salesQty(120);await sleep(1300);await salesSubmit();salesBusy=false;
+}
+function salesJump(){document.getElementById('salesPhone').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(salesAuto,500)}
+function renderPartners(){$('#partnerPills').innerHTML=PARTNERS.map((n,i)=>`<span class="pill ${i===partner?'on':''}" style="cursor:pointer" onclick="setPartner(${i})">${n}</span>`).join('')}
+function setPartner(i){
+  partner=i;renderPartners();gmfBusy=false;resetPhone();salesReset();
+  $('#gmfMsgs').innerHTML='<div class="m sys">Chọn “Nhóm với đối tác” hoặc “Nhóm nội bộ” để xem hội thoại.</div>';
+  $('#gmfTitle').textContent='Nhóm chat GMF';$('#gmfSub').textContent='OA là trưởng nhóm';
+}
+async function gmf(type){
+  if(gmfBusy)return;gmfBusy=true;const g=$('#gmfMsgs');g.innerHTML='';const P=PARTNERS[partner];const OA='Pizza 4P’s FMCG (OA)';
+  let S;
+  if(type==='internal'){
+    $('#gmfTitle').textContent='Điều phối đơn FMCG';$('#gmfSub').textContent='Nhóm nội bộ · OA là trưởng nhóm';
+    S=[['sys','Thành viên: nhân viên Kinh doanh, Kho vận, Kế toán (đã quan tâm OA). OA đã bật cho phép thành viên nhắn tin'],
+       ['in','Đơn PZ-240611 của '+P+' đã chốt: 120 thùng 4 Phô Mai 138g, giao Thứ Năm 14:00. Kho vận xác nhận tồn kho giúp.',OA],
+       ['in','Kho lạnh đủ hàng. Xe lạnh 51C-123.45 xuất kho lúc 08:00.','Thành viên · Kho vận'],
+       ['in','Đơn đã được ghi nhận vào kỳ rebate quý IV của đối tác.','Thành viên · Kế toán'],
+       ['in','Cảm ơn các bộ phận. Tình trạng đơn sẽ được cập nhật cho đối tác trên OA.',OA]];
+  }else{
+    $('#gmfTitle').textContent=P+' và 4P’s FMCG';$('#gmfSub').textContent='Nhóm với đối tác · OA là trưởng nhóm';
+    S=[['sys','Thành viên: đại diện mua hàng của '+P+' (đã quan tâm OA). OA đã bật cho phép thành viên nhắn tin'],
+       ['in','Chào mừng các anh/chị vào nhóm trao đổi đơn hàng FMCG. Thông tin trong nhóm chỉ dùng cho mục đích hợp tác kinh doanh.',OA],
+       ['out','Chúng tôi muốn biết mức giá cho đơn hàng 200 thùng.','Thành viên · Đại diện mua hàng'],
+       ['in','Bộ phận Kinh doanh sẽ gửi báo giá trong nhóm này trong hôm nay.',OA],
+       ['in','Đơn 200 thùng có thể giao làm 2 đợt, đợt đầu vào Thứ Năm. Báo giá chi tiết đã được gửi kèm.',OA]];
+  }
+  for(const [c,t,n] of S){await sleep(800);add(g,c,t,n)}
+  gmfBusy=false;
+  toast(type==='internal'?'Nhóm GMF: các bộ phận nội bộ điều phối đơn hàng':'Nhóm GMF: OA và đối tác cùng trao đổi trong một nhóm');
+}
+renderPartners();resetPhone();renderQM();renderUC();salesReset();
+
+/* ---------- TAB 4: Nhãn + Broadcast ---------- */
+const T=[['Chuỗi cửa hàng tiện lợi',24],['Siêu thị, bán lẻ',38],['Nhà hàng, khách sạn',210],['Rebate hạng Vàng',22],['Chưa đặt 60 ngày',17],['Đặt từ 2 lần',150]];
+const C=[
+ {k:'Chính sách giá mới',p:['Cập nhật bảng giá từ 01/11',catalog,'Xem bảng giá đầy đủ']},
+ {k:'Chương trình rebate',p:['Rebate quý IV','Đạt 500 triệu đồng doanh số quý để nhận mức rebate 4%. Vui lòng đặt hàng trước 15/12 để được tính vào quý này.','Xem điều kiện rebate']},
+ {k:'Sản phẩm mới',p:['Sản phẩm đông lạnh mới','Tặng mẫu thử cho đối tác đặt hàng từ 50 thùng.','Đăng ký nhận mẫu']},
+ {k:'Lịch nghỉ lễ',p:['Lịch nghỉ lễ và giao hàng','Vui lòng đặt hàng trước 28/10 để kịp giao trước kỳ nghỉ.','Xem lịch giao hàng']}
+];
+let synced=false,selT=new Set([0,3]),mode='any',selC=0;
+function hours(){let h='';for(let i=6;i<=22;i++){h+=`<option value="${i}" ${i===10?'selected':''}>${String(i).padStart(2,'0')}:00</option>`}$('#bcHour').innerHTML=h}
+function doSync(){
+  if(synced)return Promise.resolve();$('#syncBtn').disabled=true;$('#syncNote').textContent='Đang đồng bộ...';
+  return new Promise(res=>setTimeout(()=>{synced=true;$('#syncNote').textContent='Đã gắn '+T.length+' nhãn cho đối tác trên OA';
+    $('#oaTags').innerHTML=T.map(t=>`<span class="tagchip" style="cursor:default">${t[0]} <i>${t[1]}</i></span>`).join('');
+    renderBc();toast('Đã đồng bộ nhãn từ hệ thống nội bộ sang OA Manager');res()},900));
+}
+function renderBc(){
+  $('#bcTags').innerHTML=T.map((t,i)=>`<span class="tagchip ${selT.has(i)?'sel':''}" onclick="togT(${i})">${t[0]} <i>${t[1]}</i></span>`).join('');
+  $('#bcMsgs').innerHTML=C.map((c,i)=>`<span class="pill ${i===selC?'on':''}" style="cursor:pointer" onclick="selC=${i};renderBc()">${c.k}</span>`).join('');
+  $('#mAny').classList.toggle('on',mode==='any');$('#mAll').classList.toggle('on',mode==='all');
+  const h=+$('#bcHour').value;const okH=h>=6&&h<=19;
+  $('#bcWin').innerHTML=okH?'<span class="ok">Trong khung giờ gửi Broadcast (06:00 đến 19:59)</span>':'<span class="warn">Ngoài khung giờ gửi Broadcast (06:00 đến 19:59)</span>';
+  const v=[...selT].map(i=>T[i][1]);
+  let n=0;if(v.length){n=mode==='any'?Math.round(v.reduce((a,b)=>a+b,0)*0.8):Math.round(Math.min(...v)*0.35)}
+  $('#bcCount').textContent=n.toLocaleString('vi-VN');
+}
+function togT(i){if(!synced){toast('Vui lòng đồng bộ nhãn trước');return}selT.has(i)?selT.delete(i):selT.add(i);renderBc()}
+function setMode(m){mode=m;renderBc()}
+function sendBc(){
+  if(!synced){toast('Vui lòng đồng bộ nhãn trước');return}
+  if(!selT.size){toast('Vui lòng chọn ít nhất một nhãn');return}
+  const h=+$('#bcHour').value;if(h<6||h>19){toast('Giờ gửi nằm ngoài khung 06:00 đến 19:59');return}
+  const p=C[selC].p;const b=$('#bcPhone');
+  if(b.querySelector('.sys'))b.innerHTML='';
+  b.insertAdjacentHTML('beforeend',`<div class="zns"><div class="zh"><span>Pizza 4P’s FMCG</span><span>Tin Broadcast</span></div><div class="zb"><div><b>${p[0]}</b></div><p style="white-space:pre-line;padding-top:4px">${p[2]?p[1]:''}</p></div><div class="zf">${p[2]}</div></div>`);
+  b.scrollTop=b.scrollHeight;toast('Đã gửi tới '+$('#bcCount').textContent+' đối tác lúc '+String(h).padStart(2,'0')+':00');
+}
+async function autoPlay(){
+  await doSync();selT=new Set([0,3]);selC=1;mode='any';$('#bcHour').value=10;renderBc();
+  await sleep(900);sendBc();
+}
+hours();renderBc();
+
+/* ---------- TAB 5: Ngân sách ---------- */
+const BASE={A:{other:200,auth:300,pay:300,rate:200,voucher:300},B:{other:300,auth:400,pay:300,rate:300,voucher:400}};
+const TYPES={other:'Tùy chỉnh: xác nhận, giao dịch, hậu mãi (Customize)',auth:'Xác thực (Verification)',pay:'Yêu cầu thanh toán (Payment request)',rate:'Đánh giá dịch vụ, hóa đơn (Service rating, Bill)',voucher:'Ưu đãi, voucher (Promotion, Voucher)'};
+const CTA={none:['Không thêm',0],eco:['Trang OA, Mini App, bài viết OA',0],web:['Website của doanh nghiệp',100],call:['Gọi điện',200],ext:['Website hoặc Mini App doanh nghiệp khác',500],app:['Ứng dụng của doanh nghiệp',600],extapp:['Ứng dụng doanh nghiệp khác',1000],dl:['Trang tải ứng dụng',3000]};
+const IMG=300,RESP=100;
+const PKG=[{n:'Cơ bản',y:0,adv:0,g100:0},{n:'Tiêu chuẩn',y:1000000,adv:0,g100:0},{n:'Tăng trưởng',y:2500000,adv:500,g100:1},{n:'Toàn diện',y:6000000,adv:2000,g100:3}];
+const GP={g10:25000,g50:55000,g100:75000,g1000:300000};
+const RS=[['eco','none',false,4500],['none','none',false,4500],['none','none',false,4500],['none','none',false,1500],['eco','none',true,300],['none','none',false,1500],['eco','none',false,300]];
+const ROWS=J.map((j,i)=>({n:j.k,t:j.type,c1:RS[i][0],c2:RS[i][1],img:RS[i][2],resp:false,q:RS[i][3],d:j}));
+const v=id=>Math.max(0,+$(id).value||0);
+const vnd=n=>Math.round(n).toLocaleString('vi-VN')+'đ';
+const opts=(o,sel)=>Object.keys(o).map(k=>`<option value="${k}" ${k===sel?'selected':''}>${Array.isArray(o[k])?o[k][0]+(o[k][1]?' (+'+o[k][1].toLocaleString('vi-VN')+'đ)':''):o[k]}</option>`).join('');
+function rowHtml(r){
+  return `<div class="zrow">
+    <button class="zdel" onclick="delRow(this)" aria-label="Xóa mẫu tin">×</button>
+    <div><label>Tên mẫu tin</label><input type="text" class="zn" value="${r.n}"></div>
+    <div><label>Loại template</label><select class="zt">${opts(TYPES,r.t)}</select></div>
+    <div><label>Nút CTA tùy chọn 1</label><select class="zc1">${opts(CTA,r.c1)}</select></div>
+    <div><label>Nút CTA tùy chọn 2</label><select class="zc2">${opts(CTA,r.c2)}</select></div>
+    <div><label>Thành phần thêm</label><div class="zopts"><label class="chk"><input type="checkbox" class="zi" ${r.img?'checked':''}>Hình ảnh +${IMG}đ</label><label class="chk"><input type="checkbox" class="zr" ${r.resp?'checked':''}>Nút phản hồi +${RESP}đ</label></div></div>
+    <div><label>Số lượng mỗi tháng</label><input type="number" class="zq" min="0" value="${r.q}"></div>
+    <div class="zout"><b class="zsum">0đ</b><small class="zbk"></small></div>
+  </div>`;
+}
+let zActive=0;
+function renderRows(rows){$('#zRows').innerHTML=rows.map(rowHtml).join('');document.querySelectorAll('#zRows .zrow').forEach((el,i)=>{el._d=rows[i].d;el.addEventListener('click',()=>{zActive=i;budget()});el.addEventListener('focusin',()=>{if(zActive!==i){zActive=i;budget()}})});if(zActive>=rows.length)zActive=Math.max(0,rows.length-1);bindRows();budget()}
+function bindRows(){document.querySelectorAll('#zRows input,#zRows select').forEach(e=>{e.oninput=budget;e.onchange=budget})}
+function readRows(){return [...document.querySelectorAll('#zRows .zrow')].map(el=>({n:el.querySelector('.zn').value,t:el.querySelector('.zt').value,c1:el.querySelector('.zc1').value,c2:el.querySelector('.zc2').value,img:el.querySelector('.zi').checked,resp:el.querySelector('.zr').checked,q:Math.max(0,+el.querySelector('.zq').value||0),d:el._d}))}
+function addRow(){const r=readRows();r.push({n:'Mẫu tin mới',t:'other',c1:'none',c2:'none',img:false,resp:false,q:100,d:TPL.other});zActive=r.length-1;renderRows(r)}
+function delRow(btn){const els=[...document.querySelectorAll('#zRows .zrow')];const i=els.indexOf(btn.closest('.zrow'));const r=readRows();r.splice(i,1);zActive=0;renderRows(r)}
+function unitOf(r,base){
+  let eco=0,cta=0;
+  for(const c of [r.c1,r.c2]){if(c==='none')continue;if(c==='eco'){cta+=eco===0?0:100;eco++}else cta+=CTA[c][1]}
+  const parts=[[TYPES[r.t].split(':')[0].split(' (')[0],base[r.t]]];
+  if(r.img)parts.push(['hình ảnh',IMG]);if(r.resp)parts.push(['nút phản hồi',RESP]);if(cta)parts.push(['CTA',cta]);
+  return {unit:parts.reduce((a,x)=>a+x[1],0),parts};
+}
+
+const BTN={eco:'Mở trang OA',web:'Truy cập website',call:'Gọi điện',ext:'Mở website đối tác',app:'Mở ứng dụng',extapp:'Mở ứng dụng đối tác',dl:'Tải ứng dụng'};
+function preview(r,u){
+  if(!r){$('#zPrev').innerHTML='';return}
+  const src=(r.d&&r.d.type===r.t)?r.d:TPL[r.t];
+  const o=Object.assign({},src,{type:r.t,img:r.img,resp:r.resp,ctas:[r.c1,r.c2].filter(c=>c!=='none').map(c=>BTN[c])});
+  $('#zPrev').innerHTML=miniPhone(tplCard(o))+
+    `<div class="pvcap"><b>${r.n}</b><br>${u.parts.map(x=>x[0]+' '+x[1].toLocaleString('vi-VN')+'đ').join(' + ')}<br>Đơn giá <b>${u.unit.toLocaleString('vi-VN')}đ</b> mỗi tin</div>`;
+}
+function budget(){
+  const base=BASE[$('#bTbl').value],pk=PKG[+$('#bPkg').value],vat=$('#bVat').checked?1.1:1;
+  Object.keys(base).forEach(k=>{const e=document.getElementById('gp-'+k);if(e)e.textContent=base[k].toLocaleString('vi-VN')+'đ'});
+  const rows=readRows();let qty=0,zbsEx=0;
+  document.querySelectorAll('#zRows .zrow').forEach((el,i)=>{
+    const r=rows[i],u=unitOf(r,base),sum=u.unit*r.q;qty+=r.q;zbsEx+=sum;
+    el.querySelector('.zsum').textContent=vnd(sum);
+    el.querySelector('.zbk').textContent=u.parts.map(x=>x[1].toLocaleString('vi-VN')).join(' + ')+' = '+u.unit.toLocaleString('vi-VN')+'đ mỗi tin';
+  });
+  document.querySelectorAll('#zRows .zrow').forEach((el,i)=>el.classList.toggle('act',i===zActive));
+  preview(rows[zActive],rows[zActive]?unitOf(rows[zActive],base):null);
+  $('#kQty').textContent=qty.toLocaleString('vi-VN');
+  $('#kAvg').textContent=vnd(qty?zbsEx/qty:0);
+  $('#kZbs').textContent=vnd(zbsEx);
+  const zbs=zbsEx*vat;
+  const advBill=Math.max(0,v('#bAdvice')-pk.adv),adv=advBill*55;
+  const g100Bill=Math.max(0,v('#bG100')-pk.g100);
+  const gmf=v('#bG10')*GP.g10+v('#bG50')*GP.g50+g100Bill*GP.g100+v('#bG1000')*GP.g1000;
+  const pkg=pk.y/12,total=zbs+adv+gmf+pkg;
+  const trs=[
+    ['ZBS Template Message'+(vat>1?' (đã cộng VAT 10%)':''),qty,null,zbs],
+    ['Tin Tư vấn ngoài 48 giờ (sau '+pk.adv.toLocaleString('vi-VN')+' tin trong gói)',advBill,55,adv],
+    ['Nhóm GMF mua thêm (GMF-100 trừ '+pk.g100+' nhóm trong gói)',null,null,gmf],
+    ['Gói dịch vụ '+pk.n+' (chia theo tháng)',null,null,pkg]
+  ];
+  $('#bTable').innerHTML='<tr><th>Hạng mục</th><th class="num">Số lượng</th><th class="num">Đơn giá</th><th class="num">Mỗi tháng</th></tr>'+
+    trs.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]===null?'':r[1].toLocaleString('vi-VN')}</td><td class="num">${r[2]===null?'':vnd(r[2])}</td><td class="num">${vnd(r[3])}</td></tr>`).join('')+
+    `<tr class="tot"><td colspan="3">Tổng mỗi tháng</td><td class="num">${vnd(total)}</td></tr><tr><td colspan="3">Tổng mỗi năm</td><td class="num"><b>${vnd(total*12)}</b></td></tr>`;
+  const parts=[['ZBS Template Message',zbs,'#0F1B33'],['Tin Tư vấn',adv,'#0068FF'],['Nhóm GMF',gmf,'#7FB0FF'],['Gói dịch vụ',pkg,'#C3CCDA']];
+  $('#bBar').innerHTML=total?parts.map(x=>`<span style="width:${x[1]/total*100}%;background:${x[2]}"></span>`).join(''):'';
+  $('#bLegend').innerHTML=parts.map(x=>`<span><i style="background:${x[2]}"></i>${x[0]} ${total?Math.round(x[1]/total*100):0}%</span>`).join('');
+}
+document.querySelectorAll('#budget > .grid2 input,#budget > .grid2 select,#bTbl').forEach(e=>{e.addEventListener('input',budget);e.addEventListener('change',budget)});
+renderRows(ROWS);
+</script>
+</body>
+</html>
