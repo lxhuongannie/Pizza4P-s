@@ -486,7 +486,6 @@
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
       <h3 style="margin:0">ZBS Template Message theo từng mẫu tin</h3>
       <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <select id="bTbl" aria-label="Bảng giá tham chiếu"><option value="A">Bảng giá: trang bảng giá Zalo</option><option value="B">Bảng giá: thông báo 27/02/2026</option></select>
         <button class="btn sec" onclick="addRow()">Thêm mẫu tin</button>
       </span>
     </div>
@@ -527,7 +526,7 @@
       <div class="card">
         <h3>Cơ sở tính</h3>
         <p class="note" style="margin-top:0">ZBS Template Message tính theo tin gửi thành công; đơn giá chưa gồm VAT. Gói dịch vụ OA, Tin Tư vấn và nhóm GMF đã gồm VAT 10%. Tin Broadcast tính theo hạn mức của gói dịch vụ, không tính từng tin. Tin OA gửi vào nhóm GMF miễn phí đến 31/12/2026; tin của thành viên luôn miễn phí.</p>
-        <p class="note">Hai nguồn của Zalo đang ghi đơn giá template khác nhau (trang bảng giá và thông báo 27/02/2026), nên có thể chọn bảng giá tham chiếu ở phía trên. Giá hình ảnh (300đ) và nút phản hồi (100đ) lấy từ thông báo 27/02/2026. Loại Đánh giá dịch vụ, hóa đơn được tính theo mức của các loại còn lại vì Zalo chưa công bố riêng. Nguồn: zalo.solutions/business-message/pricing, thông báo cập nhật đơn giá ZBS Template Message và zalo.solutions/oa/pricing.</p>
+        <p class="note">Đơn giá ZBS Message Template theo thông báo cập nhật cấu trúc và đơn giá của Zalo ngày 27/02/2026 (chưa gồm VAT): xác thực và voucher 400đ; yêu cầu thanh toán (chuyển khoản) và các loại còn lại 300đ. Hình ảnh +300đ, nút phản hồi +100đ. Loại Đánh giá dịch vụ, hóa đơn được tính theo mức của các loại còn lại vì Zalo chưa công bố riêng. Nguồn: zalo.solutions, thông báo cập nhật cấu trúc và đơn giá ZBS Message Template; zalo.solutions/oa/pricing.</p>
       </div>
     </div>
   </div>
@@ -784,7 +783,7 @@ async function autoPlay(){
 hours();renderBc();
 
 /* ---------- TAB 5: Ngân sách ---------- */
-const BASE={A:{other:200,auth:300,pay:300,rate:200,voucher:300},B:{other:300,auth:400,pay:300,rate:300,voucher:400}};
+const BASE={other:300,auth:400,pay:300,rate:300,voucher:400};
 const TYPES={other:'Tùy chỉnh: xác nhận, giao dịch, hậu mãi (Customize)',auth:'Xác thực (Verification)',pay:'Yêu cầu thanh toán (Payment request)',rate:'Đánh giá dịch vụ, hóa đơn (Service rating, Bill)',voucher:'Ưu đãi, voucher (Promotion, Voucher)'};
 const CTA={none:['Không thêm',0],eco:['Trang OA, Mini App, bài viết OA',0],web:['Website của doanh nghiệp',100],call:['Gọi điện',200],ext:['Website hoặc Mini App doanh nghiệp khác',500],app:['Ứng dụng của doanh nghiệp',600],extapp:['Ứng dụng doanh nghiệp khác',1000],dl:['Trang tải ứng dụng',3000]};
 const IMG=300,RESP=100;
@@ -830,7 +829,7 @@ function preview(r,u){
     `<div class="pvcap"><b>${r.n}</b><br>${u.parts.map(x=>x[0]+' '+x[1].toLocaleString('vi-VN')+'đ').join(' + ')}<br>Đơn giá <b>${u.unit.toLocaleString('vi-VN')}đ</b> mỗi tin</div>`;
 }
 function budget(){
-  const base=BASE[$('#bTbl').value],pk=PKG[+$('#bPkg').value],vat=$('#bVat').checked?1.1:1;
+  const base=BASE,pk=PKG[+$('#bPkg').value],vat=$('#bVat').checked?1.1:1;
   Object.keys(base).forEach(k=>{const e=document.getElementById('gp-'+k);if(e)e.textContent=base[k].toLocaleString('vi-VN')+'đ'});
   const rows=readRows();let qty=0,zbsEx=0;
   document.querySelectorAll('#zRows .zrow').forEach((el,i)=>{
@@ -861,7 +860,7 @@ function budget(){
   $('#bBar').innerHTML=total?parts.map(x=>`<span style="width:${x[1]/total*100}%;background:${x[2]}"></span>`).join(''):'';
   $('#bLegend').innerHTML=parts.map(x=>`<span><i style="background:${x[2]}"></i>${x[0]} ${total?Math.round(x[1]/total*100):0}%</span>`).join('');
 }
-document.querySelectorAll('#budget > .grid2 input,#budget > .grid2 select,#bTbl').forEach(e=>{e.addEventListener('input',budget);e.addEventListener('change',budget)});
+document.querySelectorAll('#budget > .grid2 input,#budget > .grid2 select').forEach(e=>{e.addEventListener('input',budget);e.addEventListener('change',budget)});
 renderRows(ROWS);
 </script>
 </body>
